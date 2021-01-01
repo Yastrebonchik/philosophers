@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_one.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexander <alexander@student.42.fr>        +#+  +:+       +#+        */
+/*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2020/12/30 19:48:29 by alexander        ###   ########.fr       */
+/*   Updated: 2021/01/01 23:37:18 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,19 @@
 # include <sys/time.h>
 # include <semaphore.h>
 
-int		ft_atoi(const char *str);
-void	ft_putstr_fd(char *s, int fd);
-void	ft_putnbr_fd(int n, int fd);
+# include <stdio.h>
+
+typedef struct timeval  t_time;
+
+pthread_mutex_t *g_mutex;
+t_time          g_time;
+int             g_counter;
+int             g_trigger;
+
+int				ft_atoi(const char *str);
+void			ft_putstr_fd(char *s, int fd);
+void			ft_putnbr_fd(int n, int fd);
+void			print_state(char *phrase, int phil_num);
+unsigned int	ft_abs_substract(int a, int b);
 
 #endif

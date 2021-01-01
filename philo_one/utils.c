@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexander <alexander@student.42.fr>        +#+  +:+       +#+        */
+/*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/22 23:37:42 by kcedra            #+#    #+#             */
-/*   Updated: 2020/12/30 15:27:57 by alexander        ###   ########.fr       */
+/*   Updated: 2021/01/02 00:00:43 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
 
-int		ft_atoi(const char *str)
+int				ft_atoi(const char *str)
 {
 	int		i;
 	char	sign;
@@ -38,7 +38,7 @@ int		ft_atoi(const char *str)
 	return (number);
 }
 
-void	ft_putstr_fd(char *s, int fd)
+void			ft_putstr_fd(char *s, int fd)
 {
 	int i;
 
@@ -53,7 +53,7 @@ void	ft_putstr_fd(char *s, int fd)
 	}
 }
 
-void	ft_putnbr_fd(int n, int fd)
+void			ft_putnbr_fd(int n, int fd)
 {
 	char	nbr;
 	int		flag;
@@ -75,4 +75,26 @@ void	ft_putnbr_fd(int n, int fd)
 	if (flag == 1)
 		nbr = '8';
 	write(fd, &nbr, 1);
+}
+
+void			print_state(char *phrase, int phil_num)
+{
+	t_time	tv;
+
+	gettimeofday(&tv, NULL);
+	ft_putnbr_fd((tv.tv_sec - g_time.tv_sec) * 1000 +
+	(tv.tv_usec - g_time.tv_usec) / 1000, 1);
+	ft_putstr_fd("ms ", 1);
+	ft_putnbr_fd(phil_num, 1);
+	ft_putstr_fd(phrase, 1);
+}
+
+unsigned int	ft_abs_substract(int a, int b)
+{
+	int	res;
+
+	res = a - b;
+	if (res < 0)
+		res = res * (-1);
+	return (res);
 }
