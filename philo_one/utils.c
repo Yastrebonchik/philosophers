@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/22 23:37:42 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/03 23:59:54 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 01:35:44 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,7 @@ void			philo_init(t_philo **philos, int *params, int argc)
 		((*philos)[i]).time_to_eat = params[2];
 		((*philos)[i]).time_to_sleep = params[3];
 		((*philos)[i]).num_of_times_eat = 0;
+		((*philos)[i]).eat_trigger = 0;
 		if (argc == 6)
 			((*philos)[i]).num_of_times_eat = params[4];
 		i++;
@@ -232,5 +233,25 @@ void			threads_join(t_philo **philos)
 		pthread_join(*(*philos)[i].thread, NULL);
 		pthread_join(*(*philos)[i].supervisor, NULL);
 		i++;
+	}
+}
+
+int			check_eat_trigger(t_philo *philos, int i)
+{
+	while (i < philos[0].philo_quan)
+	{
+		if (philos[i].eat_trigger == 1)
+			return (0);
+		i += 2;
+	}
+	return (1);
+}
+
+void			set_eat_trigger(t_philo *philos, int i)
+{
+	while (i < philos[0].philo_quan)
+	{
+		philos[i].eat_trigger = 0;
+		i += 2;
 	}
 }

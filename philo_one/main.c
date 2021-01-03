@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/04 00:06:48 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 01:37:46 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,10 @@ void	*waiter(void *arr)
 					philos[i].right_fork_trigger = 1;
 					i += 2;
 				}
-				my_usleep(philos[0].time_to_eat);
+				while(check_eat_trigger(philos, 0))
+					usleep(100);
+				set_eat_trigger(philos, 0);
+				//my_usleep(philos[0].time_to_eat);
 				i = 1;
 				while (i < philos[0].philo_quan)
 				{
@@ -39,8 +42,13 @@ void	*waiter(void *arr)
 					philos[i].right_fork_trigger = 1;
 					i += 2;
 				}
-				my_usleep(philos[0].time_to_eat);
+				//my_usleep(philos[0].time_to_eat);
+				while(check_eat_trigger(philos, 1))
+					usleep(100);
+				set_eat_trigger(philos, 1);
 			}
+			//threads_join(&philos);
+			//mutex_destroy(&philos);
 			exit(0);
 		}
 		else
@@ -114,6 +122,7 @@ void	*philo(void *arr)
 		usleep(philo->philo_num * 100);
 		print_state(" is eating\n", philo->philo_num);
 		my_usleep(philo->time_to_eat);
+		philo->eat_trigger = 1;
 		if (philo->num_of_times_eat != 0)
 			philo->num_of_times_eat -= 1;
 		pthread_mutex_unlock(philo->left_fork);

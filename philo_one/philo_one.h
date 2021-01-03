@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/03 23:18:18 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 01:34:29 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct		s_philo
 	pthread_mutex_t	*right_fork;
 	int				left_fork_trigger;
 	int				right_fork_trigger;
+	int				eat_trigger;
 }					t_philo;
 
 t_time          g_time;
@@ -46,6 +47,7 @@ int				*g_mutex_trigger;
 
 int				my_usleep(t_mseconds time);
 int				ft_atoi(const char *str);
+int				check_eat_trigger(t_philo *philos, int i);
 int				eat_trigger(t_philo *philos);
 void			mutex_init(t_philo **array);
 void			mutex_destroy(t_philo **array);
@@ -56,6 +58,7 @@ void			supervisor_init(t_philo **philos);
 void			threads_init(t_philo **philos);
 void			threads_join(t_philo **philos);
 void			ft_putstr_fd(char *s, int fd);
+void			set_eat_trigger(t_philo *philos, int i);
 void			print_state(char *phrase, int phil_num);
 void			philo_init(t_philo **philos, int *params, int argc);
 unsigned int	ft_abs_substract(int a, int b);
