@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/03 19:00:33 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/03 20:19:05 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ int		main(int argc, char **argv)
 	int			j;
 	int			*params;
 	t_philo		*philos;
-	pthread_t	t1, sv;
 
 	if (argc != 5 && argc != 6)
 	{
@@ -94,13 +93,13 @@ int		main(int argc, char **argv)
 	while (i < argc)
 		params[j++] = ft_atoi(argv[i++]);
 	philos = NULL;
-	//printf("Time to eat = %d and time do sleep = %d and number to eat = %d\n", params[2], params[3], params[4]);
-	philo_init(philos, params, argc);
-	mutex_init(philos); 
-	pthread_create(&sv, NULL, supervisor, (void*)&(philos[0]));
-	pthread_create(&t1, NULL, philo, (void*)&(philos[0]));
-	pthread_join(t1, NULL);
+	printf("Time to eat = %d and time do sleep = %d and number to eat = %d\n", params[2], params[3], params[4]);
+	philo_init(&philos, params, argc);
+	mutex_init(&philos); 
+	supervisor_init(&philos);
+	threads_init(&philos);
+	threads_join(&philos);
 	ft_putstr_fd("Hello world!\n", 1);
-	mutex_destroy(philos);
+	mutex_destroy(&philos);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/03 18:36:02 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/03 20:07:22 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ typedef struct		s_philo
 	t_mseconds		time_to_eat;
 	t_mseconds		time_to_sleep;
 	int				num_of_times_eat;
+	pthread_t		*supervisor;
+	pthread_t		*thread;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 }					t_philo;
@@ -43,12 +45,17 @@ int				*g_mutex_trigger;
 
 int				my_usleep(t_mseconds time);
 int				ft_atoi(const char *str);
-void			mutex_init(t_philo *array);
-void			mutex_destroy(t_philo *array);
+void			mutex_init(t_philo **array);
+void			mutex_destroy(t_philo **array);
 void			ft_putnbr_fd(int n, int fd);
+void			*supervisor(void *arr);
+void			*philo(void *arr);
+void			supervisor_init(t_philo **philos);
+void			threads_init(t_philo **philos);
+void			threads_join(t_philo **philos);
 void			ft_putstr_fd(char *s, int fd);
 void			print_state(char *phrase, int phil_num);
-void			philo_init(t_philo *philos, int *params, int argc);
+void			philo_init(t_philo **philos, int *params, int argc);
 unsigned int	ft_abs_substract(int a, int b);
 
 #endif

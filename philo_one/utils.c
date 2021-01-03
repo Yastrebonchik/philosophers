@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/22 23:37:42 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/03 19:11:36 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/03 20:34:56 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,64 +124,103 @@ int				my_usleep(t_mseconds time)
 
 // }
 
-void			mutex_init(t_philo *philos)
+void			mutex_init(t_philo **philos)
 {
 	int				i;
 	pthread_mutex_t *mutex;
 
 	i = 0;
-	ft_putstr_fd("I'm here\n", 1);
-	ft_putnbr_fd((philos[0]).philo_quan, 1);
-	ft_putstr_fd("\n", 1);
-	ft_putstr_fd("I'm here\n", 1);
-	mutex = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * ((philos[0]).philo_quan));
-	ft_putstr_fd("I'm here\n", 1);
-	while (i < (philos[0].philo_quan))
+	mutex = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * (((*philos)[0]).philo_quan));
+	while (i < ((*philos)[0].philo_quan))
 		pthread_mutex_init(&mutex[i++], NULL);
 	i = 0;
-	while (i < (philos[0].philo_quan))
+	while (i < ((*philos)[0].philo_quan))
 	{
-		philos[i].left_fork = &(mutex[i]);
-		if (philos[i].philo_num == philos[0].philo_quan)
-			philos[i].right_fork = &(mutex[0]);
+		(*philos)[i].left_fork = &(mutex[i]);
+		if ((*philos)[i].philo_num == (*philos)[0].philo_quan)
+			(*philos)[i].right_fork = &(mutex[0]);
 		else
-			philos[i].right_fork = &(mutex[i + 1]);
+			(*philos)[i].right_fork = &(mutex[i + 1]);
 		i++;
 	}
 }
 
-void			mutex_destroy(t_philo *philos)
+void			mutex_destroy(t_philo **philos)
 {
 	int	i;
 
 	i = 0;
-	while (i < (philos[0].philo_quan))
-		pthread_mutex_destroy(philos[i++].left_fork);
+	while (i < ((*philos)[0].philo_quan))
+		pthread_mutex_destroy((*philos)[i++].left_fork);
 }
 
-void			philo_init(t_philo *philos, int *params, int argc)
+void			philo_init(t_philo **philos, int *params, int argc)
 {
 	int	i;
 
 	i = 0;
-	philos = (t_philo*)malloc(sizeof(t_philo) * params[0]);
+	(*philos) = (t_philo*)malloc(sizeof(t_philo) * params[0]);
 	while (i < params[0])
 	{
-		(philos[i]).philo_num = i;
-		(philos[i]).philo_quan = params[0];
-		ft_putnbr_fd((philos[i]).philo_quan, 1);
-		ft_putstr_fd("\n", 1);
-		(philos[i]).time_to_die = params[1];
-		(philos[i]).time_to_eat = params[2];
-		(philos[i]).time_to_sleep = params[3];
-		(philos[i]).num_of_times_eat = 0;
+		((*philos)[i]).philo_num = i + 1;
+		((*philos)[i]).philo_quan = params[0];
+		((*philos)[i]).time_to_die = params[1];
+		((*philos)[i]).time_to_eat = params[2];
+		((*philos)[i]).time_to_sleep = params[3];
+		((*philos)[i]).num_of_times_eat = 0;
 		if (argc == 6)
-			(philos[i]).num_of_times_eat = params[4];
+			((*philos)[i]).num_of_times_eat = params[4];
 		i++;
 	}
 }
 
-// void			init_threads()
-// {
-	
-// }
+void			supervisor_init(t_philo **philos)
+{
+	int			i;
+	pthread_t	*sv;
+
+	i = 0;
+	sv = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan);
+	while (i < ((*philos)[0].philo_quan))
+	{
+		if (pthread_create(&(sv[i]), NULL, supervisor, (void*)&(*philos[i])) != 0)
+		{
+			ft_putstr_fd("Threading error", 1);
+			exit(0);
+		}
+		(*philos)[i].supervisor = &(sv[i]);
+		i++;
+	}
+}
+
+void			threads_init(t_philo **philos)
+{
+	int			i;
+	pthread_t	*threads;
+
+	i = 0;
+	threads = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan);
+	while (i < ((*philos)[0].philo_quan))
+	{
+		if (pthread_create(&(threads[i]), NULL, philo, (void*)&(*philos[i])) != 0)
+		{
+			ft_putstr_fd("Threading error", 1);
+			exit(0);
+		}
+		(*philos)[i].thread = &(threads[i]);
+		i++;
+	}
+}
+
+void			threads_join(t_philo **philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < ((*philos)[0].philo_quan))
+	{
+		pthread_join(*(*philos)[i].thread, NULL);
+		pthread_join(*(*philos)[i].supervisor, NULL);
+		i++;
+	}
+}
