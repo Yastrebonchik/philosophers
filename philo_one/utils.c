@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/22 23:37:42 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/03 20:34:56 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/03 23:59:54 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,10 +119,18 @@ int				my_usleep(t_mseconds time)
 	return (1);
 }
 
-// int				eat_trigger(int tf)
-// {
+int				eat_trigger(t_philo *philos)
+{
+	int i;
 
-// }
+	i = 0;
+	while (i < philos[0].philo_quan)
+	{
+		if (philos[i++].num_of_times_eat != 0)
+			return (1);
+	}
+	return (0);
+}
 
 void			mutex_init(t_philo **philos)
 {
@@ -183,13 +191,14 @@ void			supervisor_init(t_philo **philos)
 	sv = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan);
 	while (i < ((*philos)[0].philo_quan))
 	{
-		if (pthread_create(&(sv[i]), NULL, supervisor, (void*)&(*philos[i])) != 0)
+		if (pthread_create(&(sv[i]), NULL, supervisor, (void*)&((*philos)[i])) != 0)
 		{
 			ft_putstr_fd("Threading error", 1);
 			exit(0);
 		}
 		(*philos)[i].supervisor = &(sv[i]);
 		i++;
+		usleep(100);
 	}
 }
 
@@ -202,13 +211,14 @@ void			threads_init(t_philo **philos)
 	threads = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan);
 	while (i < ((*philos)[0].philo_quan))
 	{
-		if (pthread_create(&(threads[i]), NULL, philo, (void*)&(*philos[i])) != 0)
+		if (pthread_create(&(threads[i]), NULL, philo, (void*)&((*philos)[i])) != 0)
 		{
 			ft_putstr_fd("Threading error", 1);
 			exit(0);
 		}
 		(*philos)[i].thread = &(threads[i]);
 		i++;
+		usleep(100);
 	}
 }
 
