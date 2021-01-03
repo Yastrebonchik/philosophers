@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/04 01:37:46 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 01:53:31 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	*waiter(void *arr)
 				while(check_eat_trigger(philos, 0))
 					usleep(100);
 				set_eat_trigger(philos, 0);
-				//my_usleep(philos[0].time_to_eat);
 				i = 1;
 				while (i < philos[0].philo_quan)
 				{
@@ -42,13 +41,12 @@ void	*waiter(void *arr)
 					philos[i].right_fork_trigger = 1;
 					i += 2;
 				}
-				//my_usleep(philos[0].time_to_eat);
 				while(check_eat_trigger(philos, 1))
 					usleep(100);
 				set_eat_trigger(philos, 1);
 			}
-			//threads_join(&philos);
-			//mutex_destroy(&philos);
+			threads_detach(&philos);
+			mutex_destroy(&philos);
 			exit(0);
 		}
 		else
@@ -161,10 +159,9 @@ int		main(int argc, char **argv)
 		g_death_trigger[i++]= 0;
 	philo_init(&philos, params, argc);
 	mutex_init(&philos); 
-	pthread_create(&wt, NULL, waiter, (void*)philos);
 	supervisor_init(&philos);
 	threads_init(&philos);
+	pthread_create(&wt, NULL, waiter, (void*)philos);
 	threads_join(&philos);
-	mutex_destroy(&philos);
 	return (0);
 }

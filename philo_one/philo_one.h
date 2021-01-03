@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/04 01:34:29 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 01:51:34 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ void			mutex_destroy(t_philo **array);
 void			ft_putnbr_fd(int n, int fd);
 void			*supervisor(void *arr);
 void			*philo(void *arr);
+void			threads_detach(t_philo **philos);
 void			supervisor_init(t_philo **philos);
 void			threads_init(t_philo **philos);
 void			threads_join(t_philo **philos);

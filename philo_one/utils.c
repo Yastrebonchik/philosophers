@@ -6,7 +6,7 @@
 /*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/22 23:37:42 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/04 01:35:44 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 01:51:22 by yastrebon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,5 +253,18 @@ void			set_eat_trigger(t_philo *philos, int i)
 	{
 		philos[i].eat_trigger = 0;
 		i += 2;
+	}
+}
+
+void			threads_detach(t_philo **philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < ((*philos)[0].philo_quan))
+	{
+		pthread_detach(*(*philos)[i].thread);
+		pthread_detach(*(*philos)[i].supervisor);
+		i++;
 	}
 }
