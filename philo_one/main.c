@@ -3,77 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yastrebon <yastrebon@student.42.fr>        +#+  +:+       +#+        */
+/*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/04 01:53:31 by yastrebon        ###   ########.fr       */
+/*   Updated: 2021/01/04 22:52:15 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_one.h"
-
-void	*waiter(void *arr)
-{
-	int		i;
-	t_philo	*philos;
-
-	philos = (t_philo*)arr;
-	if (philos[0].philo_quan % 2 == 0)
-	{
-		if (philos[0].num_of_times_eat != 0)
-		{
-			while (eat_trigger(philos))
-			{
-				i = 0;
-				while (i < philos[0].philo_quan)
-				{
-					philos[i].left_fork_trigger = 1;
-					philos[i].right_fork_trigger = 1;
-					i += 2;
-				}
-				while(check_eat_trigger(philos, 0))
-					usleep(100);
-				set_eat_trigger(philos, 0);
-				i = 1;
-				while (i < philos[0].philo_quan)
-				{
-					philos[i].left_fork_trigger = 1;
-					philos[i].right_fork_trigger = 1;
-					i += 2;
-				}
-				while(check_eat_trigger(philos, 1))
-					usleep(100);
-				set_eat_trigger(philos, 1);
-			}
-			threads_detach(&philos);
-			mutex_destroy(&philos);
-			exit(0);
-		}
-		else
-		{
-			while (1)
-			{
-				i = 0;
-				while (i < philos[0].philo_quan)
-				{
-					philos[i].left_fork_trigger = 1;
-					philos[i].right_fork_trigger = 1;
-					i += 2;
-				}
-				i = 1;
-				my_usleep(philos[0].time_to_eat - 1);
-				while (i < philos[0].philo_quan)
-				{
-					philos[i].left_fork_trigger = 1;
-					philos[i].right_fork_trigger = 1;
-					i += 2;
-				}
-				my_usleep(philos[0].time_to_eat - 1);
-			}
-		}
-	}
-	return NULL;
-}
 
 void	*supervisor(void *arr)
 {
@@ -88,12 +25,16 @@ void	*supervisor(void *arr)
 		if (g_death_trigger[philo->philo_num] == 1)
 		{
 			g_death_trigger[philo->philo_num] = 0;
-			time_to_die = philo->time_to_die;;
+			time_to_die = philo->time_to_die;
 		}
-		my_usleep(1);
+		msleep(1);
 	}
-	print_state(" is died\n", philo->philo_num);
-	exit(0);
+	if (check_death(philo) == 1)
+	{
+		print_state(" is died\n", philo->philo_num);
+		exit(0);
+	}
+	return (NULL);
 }
 
 void	*philo(void *arr)
@@ -101,36 +42,24 @@ void	*philo(void *arr)
 	t_philo	*philo;
 
 	philo = (t_philo*)arr;
-	while (1)
+	while (cycle_condition(philo))
 	{
 		print_state(" is thinking\n", philo->philo_num);
-		while (philo->left_fork_trigger == 0)
-			usleep(100);
 		pthread_mutex_lock(philo->left_fork);
-		philo->left_fork_trigger = 0;
-		usleep(philo->philo_num * 100);
 		print_state(" has taken a fork\n", philo->philo_num);
-		while (philo->right_fork_trigger == 0)
-			usleep(100);
-		usleep(philo->philo_num * 100);
 		pthread_mutex_lock(philo->right_fork);
 		print_state(" has taken a fork\n", philo->philo_num);
-		philo->right_fork_trigger = 0;
 		g_death_trigger[philo->philo_num] = 1;
-		usleep(philo->philo_num * 100);
 		print_state(" is eating\n", philo->philo_num);
-		my_usleep(philo->time_to_eat);
-		philo->eat_trigger = 1;
-		if (philo->num_of_times_eat != 0)
-			philo->num_of_times_eat -= 1;
+		msleep(philo->time_to_eat);
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
-		usleep(philo->philo_num * 100);
+		philo->num_of_times_eat -= 1;
 		print_state(" is sleeping\n", philo->philo_num);
-		my_usleep(philo->time_to_sleep);
-		usleep(philo->philo_num * 100);
+		msleep(philo->time_to_sleep);
 	}
-	return NULL;
+	g_death_trigger[philo->philo_num] = 0;
+	return (NULL);
 }
 
 int		main(int argc, char **argv)
@@ -138,7 +67,6 @@ int		main(int argc, char **argv)
 	int			i;
 	int			j;
 	int			*params;
-	pthread_t	wt;
 	t_philo		*philos;
 
 	if (argc != 5 && argc != 6)
@@ -153,15 +81,11 @@ int		main(int argc, char **argv)
 	while (i < argc)
 		params[j++] = ft_atoi(argv[i++]);
 	philos = NULL;
-	i = 0;
-	g_death_trigger = (int*)malloc(sizeof(int)* (params[0]));
-	while (i < params[0])
-		g_death_trigger[i++]= 0;
 	philo_init(&philos, params, argc);
-	mutex_init(&philos); 
+	mutex_init(&philos);
 	supervisor_init(&philos);
 	threads_init(&philos);
-	pthread_create(&wt, NULL, waiter, (void*)philos);
 	threads_join(&philos);
+	mutex_destroy(&philos);
 	return (0);
 }
