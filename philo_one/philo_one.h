@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/05 16:38:26 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 16:44:52 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ typedef struct			s_philo
 }						t_philo;
 
 int						*g_death_trigger;
-int						*g_mutex_trigger;
 t_time					g_time;
 pthread_mutex_t			g_print_mutex;
 
