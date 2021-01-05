@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alexander <alexander@student.42.fr>        +#+  +:+       +#+         #
+#    By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/12/30 15:34:42 by alexander         #+#    #+#              #
-#    Updated: 2020/12/30 15:34:48 by alexander        ###   ########.fr        #
+#    Updated: 2021/01/05 21:53:43 by kcedra           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ HEADER = philo_two.h
 
 FLAGS = -Wall -Werror -Wextra
 
-SOURCES = utils.c main.c
+SOURCES = utils.c main.c threads_utils.c init_funcs.c
 
 O_FILES = $(SOURCES:.c=.o)
 

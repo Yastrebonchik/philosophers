@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/05 20:36:36 by kcedra           ###   ########.fr       */
+/*   Created: 2021/01/05 19:38:08 by kcedra            #+#    #+#             */
+/*   Updated: 2021/01/05 22:07:12 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_two.h"
 
 void	*supervisor(void *arr)
 {
@@ -22,13 +22,13 @@ void	*supervisor(void *arr)
 	while (time_to_die > 0)
 	{
 		time_to_die = time_to_die - 1;
-		pthread_mutex_lock(&(philo->death_mutex));
+		sem_wait(g_death_semaphore);
 		if (g_death_trigger[philo->philo_num] == 1)
 		{
 			g_death_trigger[philo->philo_num] = 0;
 			time_to_die = philo->time_to_die;
 		}
-		pthread_mutex_unlock(&(philo->death_mutex));
+		sem_post(g_death_semaphore);
 		msleep(1);
 	}
 	if (check_death(philo) == 1)
@@ -42,22 +42,23 @@ void	*supervisor(void *arr)
 void	*philo(void *arr)
 {
 	t_philo	*philo;
-
+	
 	philo = (t_philo*)arr;
 	while (cycle_condition(philo))
 	{
 		print_state(" is thinking\n", philo->philo_num);
-		pthread_mutex_lock(philo->left_fork);
+		sem_wait(g_fork_semaphore);
 		print_state(" has taken a fork\n", philo->philo_num);
-		pthread_mutex_lock(philo->right_fork);
+		sem_wait(g_fork_semaphore);
+		//sem_getvalue(g_fork_semaphore, value);
 		print_state(" has taken a fork\n", philo->philo_num);
-		pthread_mutex_lock(&(philo->death_mutex));
+		sem_wait(g_death_semaphore);
 		g_death_trigger[philo->philo_num] = 1;
-		pthread_mutex_unlock(&(philo->death_mutex));
+		sem_post(g_death_semaphore);
 		print_state(" is eating\n", philo->philo_num);
 		msleep(philo->time_to_eat);
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
+		sem_post(g_fork_semaphore);
+		sem_post(g_fork_semaphore);
 		philo->num_of_times_eat -= 1;
 		if (philo->argc == 6 && philo->num_of_times_eat == 0)
 			break ;
@@ -69,29 +70,27 @@ void	*philo(void *arr)
 }
 
 int		main(int argc, char **argv)
-{
+{	
 	int			i;
 	int			j;
 	int			*params;
 	t_philo		*philos;
 
+	gettimeofday(&g_time, NULL);
 	if (argc != 5 && argc != 6)
 	{
 		ft_putstr_fd("Wrong number of arguments!\n", 1);
 		return (1);
 	}
-	gettimeofday(&g_time, NULL);
-	g_death = 0;
 	i = 1;
 	j = 0;
 	if (!(params = (int*)malloc(sizeof(int) * (argc))))
 		return (1);
 	while (i < argc)
 		params[j++] = ft_atoi(argv[i++]);
-	if (philo_init(&philos, params, argc) == 1 || mutex_init(&philos) == 1
+	if (philo_init(&philos, params, argc) == 1 || semaphore_init(&philos) == 1
 	|| supervisor_init(&philos) == 1 || threads_init(&philos) == 1)
 		return (1);
-	
 	while (check_death(philos))
 	{
 		if (g_death == 1)
