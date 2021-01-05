@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/04 22:52:15 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 16:38:12 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,13 @@ void	*supervisor(void *arr)
 	while (time_to_die > 0)
 	{
 		time_to_die = time_to_die - 1;
+		pthread_mutex_lock(&(philo->death_mutex));
 		if (g_death_trigger[philo->philo_num] == 1)
 		{
 			g_death_trigger[philo->philo_num] = 0;
 			time_to_die = philo->time_to_die;
 		}
+		pthread_mutex_unlock(&(philo->death_mutex));
 		msleep(1);
 	}
 	if (check_death(philo) == 1)
@@ -49,16 +51,20 @@ void	*philo(void *arr)
 		print_state(" has taken a fork\n", philo->philo_num);
 		pthread_mutex_lock(philo->right_fork);
 		print_state(" has taken a fork\n", philo->philo_num);
+		pthread_mutex_lock(&(philo->death_mutex));
 		g_death_trigger[philo->philo_num] = 1;
+		pthread_mutex_unlock(&(philo->death_mutex));
 		print_state(" is eating\n", philo->philo_num);
 		msleep(philo->time_to_eat);
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 		philo->num_of_times_eat -= 1;
+		if (philo->argc == 6 && philo->num_of_times_eat == 0)
+			break ;
 		print_state(" is sleeping\n", philo->philo_num);
 		msleep(philo->time_to_sleep);
 	}
-	g_death_trigger[philo->philo_num] = 0;
+	g_death_trigger[philo->philo_num] = 2;
 	return (NULL);
 }
 
@@ -74,13 +80,14 @@ int		main(int argc, char **argv)
 		ft_putstr_fd("Wrong number of arguments!\n", 1);
 		return (0);
 	}
-	gettimeofday(&g_time, NULL);
+	if (gettimeofday(&g_time, NULL) == -1)
+		errors_handling(GETTIMEOFDAY_ERROR);
 	i = 1;
 	j = 0;
-	params = (int*)malloc(sizeof(int) * (argc));
+	if (!(params = (int*)malloc(sizeof(int) * (argc))))
+		errors_handling(MALLOC_ERROR);
 	while (i < argc)
 		params[j++] = ft_atoi(argv[i++]);
-	philos = NULL;
 	philo_init(&philos, params, argc);
 	mutex_init(&philos);
 	supervisor_init(&philos);

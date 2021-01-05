@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/04 22:52:29 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 16:38:26 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@
 
 # include <stdio.h>
 
+# define MALLOC_ERROR 1
+# define GETTIMEOFDAY_ERROR 2
+# define USLEEP_ERROR 3
+# define PTHREAD_ERROR 4
+
 typedef struct timeval	t_time;
 typedef	unsigned int	t_mseconds;
 
@@ -28,15 +33,16 @@ typedef struct			s_philo
 {
 	int					philo_num;
 	int					philo_quan;
+	int					argc;
+	int					num_of_times_eat;
 	t_mseconds			time_to_die;
 	t_mseconds			time_to_eat;
 	t_mseconds			time_to_sleep;
-	int					num_of_times_eat;
 	pthread_t			*supervisor;
 	pthread_t			*thread;
 	pthread_mutex_t		*left_fork;
 	pthread_mutex_t		*right_fork;
-	int					argc;
+	pthread_mutex_t		death_mutex;
 }						t_philo;
 
 int						*g_death_trigger;
@@ -48,6 +54,7 @@ int						ft_atoi(const char *str);
 int						check_death(t_philo *philo);
 int						msleep(t_mseconds time);
 int						cycle_condition(t_philo *philo);
+void					errors_handling(int	err_num);
 void					mutex_init(t_philo **array);
 void					mutex_destroy(t_philo **array);
 void					ft_putnbr_fd(int n, int fd);

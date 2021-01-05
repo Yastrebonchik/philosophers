@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/05/22 23:37:42 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/04 22:53:07 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 16:08:00 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,20 +77,6 @@ void			ft_putnbr_fd(int n, int fd)
 	write(fd, &nbr, 1);
 }
 
-void			print_state(char *phrase, int phil_num)
-{
-	t_time	tv;
-
-	gettimeofday(&tv, NULL);
-	pthread_mutex_lock(&g_print_mutex);
-	ft_putnbr_fd((tv.tv_sec - g_time.tv_sec) * 1000 +
-	(tv.tv_usec - g_time.tv_usec) / 1000, 1);
-	ft_putstr_fd("ms ", 1);
-	ft_putnbr_fd(phil_num, 1);
-	ft_putstr_fd(phrase, 1);
-	pthread_mutex_unlock(&g_print_mutex);
-}
-
 int				msleep(t_mseconds time)
 {
 	t_time		tv;
@@ -98,15 +84,27 @@ int				msleep(t_mseconds time)
 	t_mseconds	now;
 
 	if (gettimeofday(&tv, NULL) == -1)
-		return (0);
+		errors_handling(GETTIMEOFDAY_ERROR);
 	start = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 	now = start;
 	while (now - start < time)
 	{
-		usleep(100);
+		if (usleep(100) == -1)
+			errors_handling(USLEEP_ERROR);
 		if (gettimeofday(&tv, NULL) == -1)
 			return (0);
 		now = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 	}
 	return (1);
+}
+
+void			errors_handling(int err_num)
+{
+	if (err_num == MALLOC_ERROR)
+		ft_putstr_fd("MALLOC ERROR\n", 2);
+	else if (err_num == GETTIMEOFDAY_ERROR)
+		ft_putstr_fd("GETTIMEOFDAY ERROR\n", 2);
+	else if (err_num == USLEEP_ERROR)
+		ft_putstr_fd("USLEEP ERROR\n", 2);
+	exit(err_num);
 }

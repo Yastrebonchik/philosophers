@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 19:30:54 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/04 22:52:34 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 16:37:25 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void			philo_init(t_philo **philos, int *params, int argc)
 	int	i;
 
 	i = 0;
-	(*philos) = (t_philo*)malloc(sizeof(t_philo) * params[0]);
+	if (!((*philos) = (t_philo*)malloc(sizeof(t_philo) * params[0])))
+		errors_handling(MALLOC_ERROR);
 	while (i < params[0])
 	{
 		((*philos)[i]).philo_num = i + 1;
@@ -31,9 +32,10 @@ void			philo_init(t_philo **philos, int *params, int argc)
 			((*philos)[i]).num_of_times_eat = params[4];
 		i++;
 	}
-	i = 0;
-	g_death_trigger = (int*)malloc(sizeof(int) * (params[0]));
-	while (i < params[0])
+	i = 1;
+	if (!(g_death_trigger = (int*)malloc(sizeof(int) * (params[0] + 1))))
+		errors_handling(MALLOC_ERROR);
+	while (i < params[0] + 1)
 		g_death_trigger[i++] = 0;
 }
 
@@ -43,7 +45,8 @@ void			supervisor_init(t_philo **philos)
 	pthread_t	*sv;
 
 	i = 0;
-	sv = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan);
+	if (!(sv = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan)))
+		errors_handling(MALLOC_ERROR);
 	while (i < ((*philos)[0].philo_quan))
 	{
 		if (pthread_create(&(sv[i]), NULL, supervisor,
@@ -54,7 +57,8 @@ void			supervisor_init(t_philo **philos)
 		}
 		(*philos)[i].supervisor = &(sv[i]);
 		i++;
-		usleep(100);
+		if (usleep(40) == -1)
+			errors_handling(USLEEP_ERROR);
 	}
 }
 
@@ -64,7 +68,9 @@ void			threads_init(t_philo **philos)
 	pthread_t	*threads;
 
 	i = 0;
-	threads = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan);
+	if (!(threads = (pthread_t*)malloc(sizeof(pthread_t) *
+	(*philos)[0].philo_quan)))
+		errors_handling(MALLOC_ERROR);
 	while (i < ((*philos)[0].philo_quan))
 	{
 		if (pthread_create(&(threads[i]), NULL, philo,
@@ -75,7 +81,8 @@ void			threads_init(t_philo **philos)
 		}
 		(*philos)[i].thread = &(threads[i]);
 		i++;
-		usleep(100);
+		if (usleep(40) == -1)
+			errors_handling(USLEEP_ERROR);
 	}
 }
 
@@ -85,10 +92,14 @@ void			mutex_init(t_philo **philos)
 	pthread_mutex_t *mutex;
 
 	i = 0;
-	mutex = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) *
-	(((*philos)[0]).philo_quan));
+	if (!(mutex = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) *
+	(((*philos)[0]).philo_quan))))
+		errors_handling(MALLOC_ERROR);
 	while (i < ((*philos)[0].philo_quan))
+	{
+		pthread_mutex_init(&((*philos)[i]).death_mutex, NULL);
 		pthread_mutex_init(&mutex[i++], NULL);
+	}
 	i = 0;
 	while (i < ((*philos)[0].philo_quan))
 	{
