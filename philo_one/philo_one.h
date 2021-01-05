@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/05 16:44:52 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 19:27:40 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,6 @@
 # include <semaphore.h>
 
 # include <stdio.h>
-
-# define MALLOC_ERROR 1
-# define GETTIMEOFDAY_ERROR 2
-# define USLEEP_ERROR 3
-# define PTHREAD_ERROR 4
 
 typedef struct timeval	t_time;
 typedef	unsigned int	t_mseconds;
@@ -45,26 +40,25 @@ typedef struct			s_philo
 	pthread_mutex_t		death_mutex;
 }						t_philo;
 
+int						g_death;
 int						*g_death_trigger;
 t_time					g_time;
 pthread_mutex_t			g_print_mutex;
 
 int						ft_atoi(const char *str);
 int						check_death(t_philo *philo);
-int						msleep(t_mseconds time);
 int						cycle_condition(t_philo *philo);
-void					errors_handling(int	err_num);
-void					mutex_init(t_philo **array);
+int						threads_join(t_philo **philos);
+int						philo_init(t_philo **philos, int *params, int argc);
+int						supervisor_init(t_philo **philos);
+int						threads_init(t_philo **philos);
+int						mutex_init(t_philo **philos);
+void					msleep(t_mseconds time);
 void					mutex_destroy(t_philo **array);
 void					ft_putnbr_fd(int n, int fd);
 void					*supervisor(void *arr);
 void					*philo(void *arr);
-void					supervisor_init(t_philo **philos);
-void					threads_init(t_philo **philos);
-void					threads_join(t_philo **philos);
 void					ft_putstr_fd(char *s, int fd);
-void					set_eat_trigger(t_philo *philos, int i);
 void					print_state(char *phrase, int phil_num);
-void					philo_init(t_philo **philos, int *params, int argc);
 
 #endif

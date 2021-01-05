@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 15:21:31 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/05 16:38:12 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 19:24:19 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	*supervisor(void *arr)
 	if (check_death(philo) == 1)
 	{
 		print_state(" is died\n", philo->philo_num);
-		exit(0);
+		g_death = 1;
 	}
 	return (NULL);
 }
@@ -78,21 +78,21 @@ int		main(int argc, char **argv)
 	if (argc != 5 && argc != 6)
 	{
 		ft_putstr_fd("Wrong number of arguments!\n", 1);
-		return (0);
+		return (1);
 	}
-	if (gettimeofday(&g_time, NULL) == -1)
-		errors_handling(GETTIMEOFDAY_ERROR);
 	i = 1;
 	j = 0;
 	if (!(params = (int*)malloc(sizeof(int) * (argc))))
-		errors_handling(MALLOC_ERROR);
+		return (1);
 	while (i < argc)
 		params[j++] = ft_atoi(argv[i++]);
-	philo_init(&philos, params, argc);
-	mutex_init(&philos);
-	supervisor_init(&philos);
-	threads_init(&philos);
-	threads_join(&philos);
-	mutex_destroy(&philos);
+	if (philo_init(&philos, params, argc) == 1 || mutex_init(&philos) == 1
+	|| supervisor_init(&philos) == 1 || threads_init(&philos) == 1)
+		return (1);
+	while (1)
+	{
+		if (g_death == 1)
+			break ;
+	}
 	return (0);
 }
