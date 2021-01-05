@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_funcs.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alexander <alexander@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 19:40:07 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/05 22:07:47 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 23:20:06 by alexander        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,9 @@ int				semaphore_init(t_philo **philos)
 	sem_unlink("/g_death_semaphore");
 	sem_unlink("/g_print_semaphore");
 	sem_unlink("/g_fork_semaphore");
-	g_death_semaphore = sem_open("/g_death_semaphore", 0, 1);
-	g_print_semaphore = sem_open("/g_print_semaphore", 0, 1);
-	g_fork_semaphore = sem_open("/g_fork_semaphore", 0,
+	g_death_semaphore = sem_open("/g_death_semaphore", O_CREAT, S_IRWXU, 1);
+	g_print_semaphore = sem_open("/g_print_semaphore", O_CREAT, S_IRWXU, 1);
+	g_fork_semaphore = sem_open("/g_fork_semaphore", O_CREAT, S_IRWXU, 
 	(*philos)[0].philo_quan);
 	printf("(*philos)[0].philo_quan) = %d\n", (*philos)[0].philo_quan);
 	if (g_death_semaphore == NULL || g_print_semaphore == NULL ||
