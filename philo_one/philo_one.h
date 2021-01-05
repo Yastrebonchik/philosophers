@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/05 19:27:40 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/05 19:48:01 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <semaphore.h>
-
-# include <stdio.h>
 
 typedef struct timeval	t_time;
 typedef	unsigned int	t_mseconds;
