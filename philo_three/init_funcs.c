@@ -5,18 +5,20 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/04 19:30:54 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/06 23:42:48 by kcedra           ###   ########.fr       */
+/*   Created: 2021/01/06 16:12:06 by kcedra            #+#    #+#             */
+/*   Updated: 2021/01/06 23:42:53 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_three.h"
 
 int				philo_init(t_philo **philos, int *params, int argc)
 {
 	int	i;
 
 	i = 0;
+	g_death_counter = 0;
+	gettimeofday(&g_time, NULL);
 	if (!((*philos) = (t_philo*)malloc(sizeof(t_philo) * params[0])))
 		return (1);
 	while (i < params[0])
@@ -26,86 +28,50 @@ int				philo_init(t_philo **philos, int *params, int argc)
 		((*philos)[i]).time_to_die = params[1];
 		((*philos)[i]).time_to_eat = params[2];
 		((*philos)[i]).time_to_sleep = params[3];
+		((*philos)[i]).death_trigger = 0;
 		((*philos)[i]).num_of_times_eat = 0;
 		((*philos)[i]).argc = argc;
 		if (argc == 6)
 			((*philos)[i]).num_of_times_eat = params[4];
 		i++;
 	}
-	i = 1;
-	if (!(g_death_trigger = (int*)malloc(sizeof(int) * (params[0] + 1))))
-		return (1);
-	while (i < params[0] + 1)
-		g_death_trigger[i++] = 0;
 	return (0);
 }
 
-int				supervisor_init(t_philo **philos)
+int				process_init(t_philo **philos)
 {
 	int			i;
-	pthread_t	*sv;
+	pid_t		*processes;
 
-	i = 0;
-	if (!(sv = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan)))
+	if (!(processes = (pid_t*)malloc(sizeof(pid_t) * (*philos)[0].philo_quan)))
 		return (1);
+	i = 0;
 	while (i < ((*philos)[0].philo_quan))
 	{
-		if (pthread_create(&(sv[i]), NULL, supervisor,
-		(void*)&((*philos)[i])) != 0)
+		processes[i] = fork();
+		if (processes[i] < 0)
 			return (1);
-		(*philos)[i].supervisor = &(sv[i]);
+		else if (processes[i] == 0)
+			philo((void*)&((*philos)[i]));
 		i++;
-		usleep(40);
+		usleep(100);
 	}
+	parent_process(processes, *philos);
 	return (0);
 }
 
-int				threads_init(t_philo **philos)
+int				semaphore_init(t_philo **philos)
 {
-	int			i;
-	pthread_t	*threads;
-
-	i = 0;
-	if (!(threads = (pthread_t*)malloc(sizeof(pthread_t) *
-	(*philos)[0].philo_quan)))
+	sem_unlink("g_death_semaphore");
+	sem_unlink("g_print_semaphore");
+	sem_unlink("g_fork_semaphore");
+	g_death_semaphore = sem_open("g_death_semaphore", O_CREAT, S_IRWXU, 1);
+	g_print_semaphore = sem_open("g_print_semaphore", O_CREAT, S_IRWXU, 1);
+	g_fork_semaphore = sem_open("g_fork_semaphore", O_CREAT, S_IRWXU,
+	(*philos)[0].philo_quan);
+	if (g_print_semaphore == NULL || g_fork_semaphore == NULL
+	|| g_death_semaphore == NULL)
 		return (1);
-	while (i < ((*philos)[0].philo_quan))
-	{
-		if (pthread_create(&(threads[i]), NULL, philo,
-		(void*)&((*philos)[i])) != 0)
-			return (1);
-		(*philos)[i].thread = &(threads[i]);
-		i++;
-		usleep(40);
-	}
-	return (0);
-}
-
-int				mutex_init(t_philo **philos)
-{
-	int				i;
-	pthread_mutex_t *mutex;
-
-	i = 0;
-	if (!(mutex = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) *
-	(((*philos)[0]).philo_quan))))
-		return (1);
-	while (i < ((*philos)[0].philo_quan))
-	{
-		pthread_mutex_init(&((*philos)[i]).death_mutex, NULL);
-		pthread_mutex_init(&mutex[i++], NULL);
-	}
-	i = 0;
-	while (i < ((*philos)[0].philo_quan))
-	{
-		(*philos)[i].left_fork = &(mutex[i]);
-		if ((*philos)[i].philo_num == (*philos)[0].philo_quan)
-			(*philos)[i].right_fork = &(mutex[0]);
-		else
-			(*philos)[i].right_fork = &(mutex[i + 1]);
-		i++;
-	}
-	pthread_mutex_init(&g_print_mutex, NULL);
 	return (0);
 }
 

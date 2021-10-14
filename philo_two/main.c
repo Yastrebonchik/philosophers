@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 19:38:08 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/05 22:07:12 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/06 23:42:56 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	*supervisor(void *arr)
 		sem_post(g_death_semaphore);
 		msleep(1);
 	}
-	if (check_death(philo) == 1)
+	if (check_death(philo))
 	{
 		print_state(" is died\n", philo->philo_num);
 		g_death = 1;
@@ -42,7 +42,7 @@ void	*supervisor(void *arr)
 void	*philo(void *arr)
 {
 	t_philo	*philo;
-	
+
 	philo = (t_philo*)arr;
 	while (cycle_condition(philo))
 	{
@@ -50,7 +50,6 @@ void	*philo(void *arr)
 		sem_wait(g_fork_semaphore);
 		print_state(" has taken a fork\n", philo->philo_num);
 		sem_wait(g_fork_semaphore);
-		//sem_getvalue(g_fork_semaphore, value);
 		print_state(" has taken a fork\n", philo->philo_num);
 		sem_wait(g_death_semaphore);
 		g_death_trigger[philo->philo_num] = 1;
@@ -70,24 +69,18 @@ void	*philo(void *arr)
 }
 
 int		main(int argc, char **argv)
-{	
-	int			i;
-	int			j;
+{
 	int			*params;
 	t_philo		*philos;
 
-	gettimeofday(&g_time, NULL);
 	if (argc != 5 && argc != 6)
 	{
 		ft_putstr_fd("Wrong number of arguments!\n", 1);
 		return (1);
 	}
-	i = 1;
-	j = 0;
-	if (!(params = (int*)malloc(sizeof(int) * (argc))))
-		return (1);
-	while (i < argc)
-		params[j++] = ft_atoi(argv[i++]);
+	params = NULL;
+	if (args_check(&params, argc, argv) == 1)
+		return (0);
 	if (philo_init(&philos, params, argc) == 1 || semaphore_init(&philos) == 1
 	|| supervisor_init(&philos) == 1 || threads_init(&philos) == 1)
 		return (1);

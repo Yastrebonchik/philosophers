@@ -6,7 +6,7 @@
 #    By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/12/30 15:34:11 by alexander         #+#    #+#              #
-#    Updated: 2021/01/05 19:36:50 by kcedra           ###   ########.fr        #
+#    Updated: 2021/01/06 23:42:54 by kcedra           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ HEADER = philo_three.h
 
 FLAGS = -Wall -Werror -Wextra
 
-SOURCES = utils.c main.c
+SOURCES = utils.c main.c init_funcs.c threads_utils.c
 
 O_FILES = $(SOURCES:.c=.o)
 

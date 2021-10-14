@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_funcs.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alexander <alexander@student.42.fr>        +#+  +:+       +#+        */
+/*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 19:40:07 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/05 23:20:06 by alexander        ###   ########.fr       */
+/*   Updated: 2021/01/06 23:42:56 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ int				supervisor_init(t_philo **philos)
 	pthread_t	*sv;
 
 	i = 0;
+	gettimeofday(&g_time, NULL);
 	if (!(sv = (pthread_t*)malloc(sizeof(pthread_t) * (*philos)[0].philo_quan)))
 		return (1);
 	while (i < ((*philos)[0].philo_quan))
@@ -89,11 +90,37 @@ int				semaphore_init(t_philo **philos)
 	sem_unlink("/g_fork_semaphore");
 	g_death_semaphore = sem_open("/g_death_semaphore", O_CREAT, S_IRWXU, 1);
 	g_print_semaphore = sem_open("/g_print_semaphore", O_CREAT, S_IRWXU, 1);
-	g_fork_semaphore = sem_open("/g_fork_semaphore", O_CREAT, S_IRWXU, 
+	g_fork_semaphore = sem_open("/g_fork_semaphore", O_CREAT, S_IRWXU,
 	(*philos)[0].philo_quan);
-	printf("(*philos)[0].philo_quan) = %d\n", (*philos)[0].philo_quan);
 	if (g_death_semaphore == NULL || g_print_semaphore == NULL ||
 	g_fork_semaphore == NULL)
 		return (1);
+	return (0);
+}
+
+int				args_check(int **params, int argc, char **argv)
+{
+	int	i;
+	int	j;
+
+	i = 1;
+	j = 0;
+	if (!((*params) = (int*)malloc(sizeof(int) * (argc))))
+	{
+		ft_putstr_fd("Malloc error\n", 2);
+		return (1);
+	}
+	while (i < argc)
+		(*params)[j++] = ft_atoi(argv[i++]);
+	i = 0;
+	while (i < argc - 1)
+	{
+		if ((*params)[i] <= 0)
+		{
+			ft_putstr_fd("Wrong arguments!\n", 2);
+			return (1);
+		}
+		i++;
+	}
 	return (0);
 }

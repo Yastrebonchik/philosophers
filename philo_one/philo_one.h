@@ -6,7 +6,7 @@
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/30 14:28:27 by alexander         #+#    #+#             */
-/*   Updated: 2021/01/05 19:48:01 by kcedra           ###   ########.fr       */
+/*   Updated: 2021/01/06 23:42:51 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <sys/time.h>
-# include <semaphore.h>
 
 typedef struct timeval	t_time;
 typedef	unsigned int	t_mseconds;
@@ -51,6 +50,7 @@ int						philo_init(t_philo **philos, int *params, int argc);
 int						supervisor_init(t_philo **philos);
 int						threads_init(t_philo **philos);
 int						mutex_init(t_philo **philos);
+int						args_check(int **params, int argc, char **argv);
 void					msleep(t_mseconds time);
 void					mutex_destroy(t_philo **array);
 void					ft_putnbr_fd(int n, int fd);

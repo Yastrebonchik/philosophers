@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: kcedra <kcedra@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/05 19:40:19 by kcedra            #+#    #+#             */
-/*   Updated: 2021/01/06 23:42:59 by kcedra           ###   ########.fr       */
+/*   Created: 2021/01/06 16:11:33 by kcedra            #+#    #+#             */
+/*   Updated: 2021/01/06 23:42:55 by kcedra           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_two.h"
+#include "philo_three.h"
 
 int				ft_atoi(const char *str)
 {
