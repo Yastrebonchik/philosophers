@@ -1,1 +1,1 @@
-The current project is a classic task about dining philosophers. In fisrt and second cases threads are used, while in the first it is realised with mutexes, in the second one it realised with semaphores. In the third variant processess and semaphores are used.
+The current project is a classic task about dining philosophers. In fisrt and second cases threads are used, while in the first it is realised with mutexes, in the second one it is realised with semaphores. In the third variant processess and semaphores are used.
